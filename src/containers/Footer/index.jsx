@@ -1,14 +1,14 @@
 import React from 'react'
-import {connect} from 'react-redux'
+import {useDispatch, useSelector} from 'react-redux'
 import {updateTodolist} from '../../redux/actions/todolist'
-const FooterUI = props => {
-    const {todolist,updateTodolist,currentField} = props;
+const Footer = () => {
+    const {todolist,currentField} = useSelector(state => ({todolist: state.todolist,currentField: state.currentField}));
+    const dispatch = useDispatch();
     // 展示的数据数量
     const todoCount = todolist.filter(item => item.isShow).length;
     const handleClick = (status) => {
         // 更新当前点击对象
-        
-        updateTodolist({isFilter: true, status})
+        dispatch(updateTodolist({isFilter: true, status}))
     }
     return (
         <div className='footer'>
@@ -24,9 +24,4 @@ const FooterUI = props => {
         </div>
     )
 }
-export default connect(
-    state => ({todolist: state.todolist, currentField: state.currentField}),
-    {
-        updateTodolist 
-    }
-)(FooterUI)
+export default Footer

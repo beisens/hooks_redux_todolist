@@ -9,9 +9,11 @@
     解决：useEffect钩子函数，当isEdit状态改变时触发：
 */
 import React, { useState, Fragment, useRef, useEffect } from 'react'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { updateTodolist } from '../../../redux/actions/todolist'
-const ItemUI = props => {
+const Item = props => {
+    const dispatch = useDispatch();
+    // const {todolist} = useSelector(state => ({todolist: state.todolist}))
     const [currentItem, setCurrentItem] = useState('00'); // 当前鼠标选中的元素
     const [isEdit, setIsEdit] = useState(false); // 是否处于编辑状态
     const [value, setValue] = useState(''); // 存放编辑的任务名
@@ -23,7 +25,7 @@ const ItemUI = props => {
         }
     }, [isEdit])
     // console.log(props);
-    const { id, isFinished, title, isShow, updateTodolist} = props
+    const { id, isFinished, title, isShow} = props
     // 鼠标移入显示删除
     const handleMouse = (flag, id) => {
         if(flag) {
@@ -36,22 +38,13 @@ const ItemUI = props => {
     }
     // 更新某个任务状态
     const updateOneState = (checkedOne, id) => {
-        updateTodolist({checkedOne,id})
+        dispatch(updateTodolist({checkedOne,id}))
     }
     // 编辑状态
     const handleEdit = event => {
         setValue(event.target.innerHTML)
         // 双击开启编辑
         setIsEdit(true)       
-    }
-    // 封装setEdit函数为同步
-    const setEdiltAsync = () => {
-        return new Promise(reslove => {
-            setIsEdit(editState => {
-                editState = true;
-                return editState;
-            })
-        }) 
     }
     // 修改任务
     const handleBlur = (event, id) => {
@@ -62,11 +55,11 @@ const ItemUI = props => {
         }
         // 失焦关闭编辑
         setIsEdit(false)
-        updateTodolist({isEdit: true, id, title: value})
+        dispatch(updateTodolist({isEdit: true, id, title: value}))
     }
     // 删除任务
-    const tdeleteTodo = id => {
-        updateTodolist({isDelete: true, id})
+    const deleteTodo = id => {
+        dispatch(updateTodolist({isDelete: true, id}))
     }
     return (
         <Fragment>
@@ -80,14 +73,9 @@ const ItemUI = props => {
                         <input type="text" className='edit' onBlur={event => handleBlur(event, id)} ref={inputRef} />
                 }
 
-                <div className='delete' onClick={() => tdeleteTodo(id)} style={currentItem === id ? { display: 'block' } : { display: 'none' }}>X</div>
+                <div className='delete' onClick={() => deleteTodo(id)} style={currentItem === id ? { display: 'block' } : { display: 'none' }}>X</div>
             </div>}
         </Fragment>
     )
 }
-export default connect(
-    state => ({ todolist: state.todolist }),
-    {
-        updateTodolist
-    }
-)(ItemUI)
+export default Item
